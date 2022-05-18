@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import torch
 import torch.nn as nn
 from torchvision import models
-import app.preprocess_data as prep
+import preprocess_data as prep
 from typing import Callable, Union
 from pydantic import BaseModel
 
@@ -44,7 +44,7 @@ def process_and_predict(data: Union[str, bytes], img_getter: Callable):
 
 
 animal_m = gen_model()
-animal_m.load_state_dict(torch.load("app/Models/ResNet18TL.pt", map_location=torch.device(device)))
+animal_m.load_state_dict(torch.load("./Models/ResNet18TL.pt", map_location=torch.device(device)))
 animal_m.eval()
 
 
