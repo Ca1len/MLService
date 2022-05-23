@@ -36,7 +36,7 @@ async def pred_from_path(img: Image):
 async def pred_type_from_url(img: Image):
     image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224))
     a = animal_m.predict(img=image)
-    return {"CLASS_NAME": a}
+    return {"class_name": a}
 
 
 @app.post("/predict/dog_breed/from_url/")
@@ -44,4 +44,4 @@ async def pred_dog_from_url(img: Image):
     image = prep.process_image(prep.get_img_from_url(img.img_path), (299, 299), framework="tf-torch")
     print(image)
     b = dog_breed.predict(img=image)
-    return {"BREED": b}
+    return {"breed": b}
