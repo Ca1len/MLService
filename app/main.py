@@ -1,7 +1,16 @@
 from fastapi import FastAPI
+import torch
+import torch.nn as nn
+from torchvision import models
 import preprocess_data as prep
+from typing import Callable, Union
 from pydantic import BaseModel
-import models
+
+
+ANIMAL_CLASSES = {
+    0: "Cat",
+    1: "Dog"
+}
 
 
 class Image(BaseModel):
