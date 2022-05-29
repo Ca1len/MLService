@@ -34,8 +34,10 @@ class DogsBreedModel:
         shape = (3, 299, 299)
         # self.xception_bottleneck = xception.Xception(weights='imagenet', include_top=False, pooling=POOLING)
         # self.inception_bottleneck = inception_v3.InceptionV3(weights='imagenet', include_top=False, pooling=POOLING)
-        self.xception_bottleneck = model_prep(torch.nn.Sequential(*(list(timm.create_model('xception', pretrained=True, num_classes=1000).children())[:-1])))
-        self.inception_bottleneck = model_prep(torch.nn.Sequential(*(list(timm.create_model('inception_v3', pretrained=True, num_classes=1000).children())[:-1])))
+        self.xception_bottleneck = model_prep(torch.nn.Sequential(
+            *(list(timm.create_model('xception', pretrained=True, num_classes=1000).children())[:-1])))
+        self.inception_bottleneck = model_prep(torch.nn.Sequential(
+            *(list(timm.create_model('inception_v3', pretrained=True, num_classes=1000).children())[:-1])))
         self.logreg = pickle.load(open("./Models/IXnceptionLogReg.pkl", 'rb'))
 
     def predict(self, img) -> str:
