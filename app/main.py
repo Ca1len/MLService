@@ -19,6 +19,20 @@ class Image(BaseModel):
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+class Model():
+    def __init__(self):
+        self.pre_model = torch.nn.Sequential(*(list(timm.create_model('vgg16', 
+                pretrained=True, num_classes=1000).children())[:-1]))
+        self.path = "Log_Reg_on_Resnet50_features"
+    def pre_f(img):
+        return self.pre_model(img)
+
+    def predict(img):
+        Img = pre_f(img)
+        model_after = pickle.load(open( "Models/Log_Reg_on_Resnet50_features" , 'rb' ) )
+        return model_after.predict(Img)
+
+
 
 def gen_model():
     model_ft = models.resnet18(pretrained=True)
