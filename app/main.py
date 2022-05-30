@@ -1,11 +1,9 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-import torch
-import torch.nn as nn
-import preprocess_data as prep
-from typing import Callable, Union
 from pydantic import BaseModel
+
 import models
+import preprocess_data as prep
 
 
 class Image(BaseModel):

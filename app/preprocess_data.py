@@ -1,11 +1,11 @@
-import torch
-from torchvision import transforms
-from PIL import Image
 import io
-import requests
+
 import numpy as np
-from numpy.typing import NDArray
+import requests
+import torch
+from PIL import Image
 from keras.utils import image_utils
+from torchvision import transforms
 
 a = 0
 

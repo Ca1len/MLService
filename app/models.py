@@ -1,12 +1,12 @@
-from typing import Tuple, Any
+import json
+import pickle
+from typing import Tuple
 
+import numpy as np
+import timm
+import torch
 import torch.nn as nn
 from torchvision import models
-import torch
-import numpy as np
-import pickle
-import timm
-import json
 
 device = "cpu"
 
