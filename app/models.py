@@ -82,7 +82,7 @@ class AnimalTypeModel(object):
         self.model.load_state_dict(torch.load("./Models/ResNet18TL.pt", map_location=torch.device(device)))
         self.model.eval()
 
-    def predict(self, img: np.ndarray) -> str:
+    def predict(self, img: torch.Tensor) -> str:
         img = torch.tensor(img)
         with torch.no_grad():
             model_pred = self.model(img)
