@@ -1,3 +1,4 @@
+import torch
 from torchvision import transforms
 from PIL import Image
 import io
@@ -26,7 +27,7 @@ def get_img_from_path(path: str):
     return image
 
 
-def process_image(img, shape: tuple, framework='torch') -> NDArray:
+def process_image(img, shape: tuple, framework='torch') -> torch.Tensor:
     """
 
     :param img:
@@ -34,7 +35,6 @@ def process_image(img, shape: tuple, framework='torch') -> NDArray:
     :param framework: should be "torch", "keras" or "tf"
     :return: if framework - "torch" returns torch.tensor batch, for "keras" returns np.array batch
     """
-    print(img)
     if framework == 'torch':
         transform = transforms.Compose(
             [

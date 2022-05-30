@@ -1,16 +1,11 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 import torch
 import torch.nn as nn
-from torchvision import models
 import preprocess_data as prep
 from typing import Callable, Union
 from pydantic import BaseModel
-
-
-ANIMAL_CLASSES = {
-    0: "Cat",
-    1: "Dog"
-}
+import models
 
 
 class Image(BaseModel):
@@ -21,13 +16,16 @@ device = "cpu"
 
 animal_m = models.AnimalTypeModel()
 dog_breed = models.DogsBreedModel()
+cat_breed = models.CatBreedsModel()
+
 
 app = FastAPI()
 
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    response = RedirectResponse("/docs")
+    return response
 
 
 @app.get("/{item:path}")
@@ -37,13 +35,13 @@ async def test(item: str):
 
 @app.get("/predict/animal_type/from_local_path/")
 async def pred_from_path(img: Image):
-    return {"asdf": "asdf"}
+    return {"Status": "Will be added as needed."}
     # return {"asdfsdf": process_and_predict(img.img_path, prep.get_img_from_path)}
 
 
 @app.post("/predict/animal_type/from_url/")
 async def pred_type_from_url(img: Image):
-    image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224))
+    image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224)).detach().numpy()
     a = animal_m.predict(img=image)
     return {"class_name": a}
 
@@ -51,6 +49,12 @@ async def pred_type_from_url(img: Image):
 @app.post("/predict/dog_breed/from_url/")
 async def pred_dog_from_url(img: Image):
     image = prep.process_image(prep.get_img_from_url(img.img_path), (299, 299), framework="tf-torch")
-    print(image)
-    b = dog_breed.predict(img=image)
-    return {"breed": b}
+    b, prob = dog_breed.predict(img=image)
+    return {"breed": b, "probability": str(prob)}
+
+
+@app.post("/predict/cat_breed/from_url/")
+async def pred_dog_from_url(img: Image):
+    image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224))
+    b, prob = cat_breed.predict(img=image)
+    return {"breed": b, "probability": str(prob)}
