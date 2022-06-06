@@ -7,7 +7,7 @@ import preprocess_data as prep
 
 
 class Image(BaseModel):
-    img_path: str
+    img_path: Union[list[AnyStr],AnuStr]
 
 
 device = "cpu"

@@ -108,9 +108,10 @@ class AnimalTypeModel(object):
         self.model.load_state_dict(torch.load("./Models/ResNet18TL.pt", map_location=torch.device(device)))
         self.model.eval()
 
-    def predict(self, img: torch.Tensor) -> str:
-        img = torch.tensor(img)
+    def predict(self, images: torch.Tensor) -> str:
+        ans = np.empty(images.shape[0],dtype = np.float32)
         with torch.no_grad():
-            model_pred = self.model(img)
-            ans = animal_types[str(int((torch.max(model_pred, 1)[1])))]
-        return ans
+            for i,img in enumerate(images):
+                model_pred = self.model(img.unsqueeze(0))
+                ans[i] = torch.max(model_pred,1)[1]
+        return str(int(np.mean(ans) >= 0.5))

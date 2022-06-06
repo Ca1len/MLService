@@ -16,15 +16,20 @@ def get_img_from_bytes(byte_array: bytes):
     return image
 
 
-def get_img_from_url(url: str):
-    image_data = requests.get(url).content
-    return get_img_from_bytes(image_data)
+def get_img_from_url(urls: Union[list[str],str]):
+    if type(urls) == list:
+        image_datas = [requests.get(url).content for url in urls]
+    else:
+        image_datas = [requests.get(urls).content]
+    return [get_img_from_bytes(image_data) for image_data in image_datas]
 
 
-def get_img_from_path(path: str):
-    image = Image.open(path)
-    image = image.convert("RGB")
-    return image
+def get_img_from_path(pathes: Union[list[str],str]):
+    if type(pathes) == list:
+        images = [Image.open(path) for path in pathes]
+    else:
+        images = [Image.open(pathes)]
+    return [image.convert("RGB") for img in images]
 
 
 def process_image(images, shape: tuple, standardization=False) -> torch.Tensor:
