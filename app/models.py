@@ -66,7 +66,7 @@ class DogsBreedModel(object):
 
         Probas = X[using_id][0][X[using_id][1]]
         Breeds_ids = X[using_id][1]
-        Breeds_str = [dog_breeds[str(int(breed_id) - 1)] for breed_id in Breeds_ids]
+        Breeds_str = [dog_breeds[str(int(breed_id))] for breed_id in Breeds_ids]
         return Breeds_str,Probas
 
 
