@@ -27,13 +27,13 @@ def get_img_from_path(path: str):
     return image
 
 
-def process_image(img, shape: tuple, standardization=False) -> torch.Tensor:
+def process_image(images, shape: tuple, standardization=False) -> torch.Tensor:
     """
 
-    :param img:
+    :param images:
     :param shape:
     :param standardization:
-    :return: batch with on tensored image in
+    :return: batch with on tensored images in
     """
     transform = transforms.Compose(
         [
@@ -42,11 +42,14 @@ def process_image(img, shape: tuple, standardization=False) -> torch.Tensor:
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ]
     )
-    ret = transform(img)
-    if standardization:
-        ret = 2. * (ret - 0) - 1.
-    ret = ret.unsqueeze(0)
-    return ret
+    Ret = torch.empty(tuple([len(images)]+[3]+list(shape)))
+    
+    for i,img in enumerate(images):
+        Ret[i] = transform(img)
+        if standardization:
+            Ret[i] = 2. * (Ret[i] - 0) - 1.
+    
+    return Ret
 
 
 if __name__ == "__main__":

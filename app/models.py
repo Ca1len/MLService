@@ -47,28 +47,54 @@ class DogsBreedModel(object):
             *(list(timm.create_model('inception_v3', pretrained=True, num_classes=1000).children())[:-1])))
         self.logreg = pickle.load(open("Models/IXnceptionLogReg_on_dog_features.pkl", 'rb'))
 
-    def predict(self, img: torch.Tensor) -> Tuple[str, float]:
+    def predict(self, images: torch.Tensor) -> Tuple[str, float]:
+        X = []
+        Value = np.zeros(images.shape[0])
         with torch.no_grad():
-            x_bf = self.xception_bottleneck(img)
-            i_bf = self.inception_bottleneck(img)
-            # x_bf = self.xception_bottleneck.predict(img, batch_size=1, verbose=1)
-            # i_bf = self.inception_bottleneck.predict(img, batch_size=1, verbose=1)
-        X = np.hstack([x_bf, i_bf])
-        return dog_breeds[str(int(self.logreg.predict(X)))], np.sort(self.logreg.predict_proba(X)[0])[-1]
+            for i,img in enumerate(images):
+                x_bf = self.xception_bottleneck(img.unsqueeze(0))
+                i_bf = self.inception_bottleneck(img.unsqueeze(0))
+                # x_bf = self.xception_bottleneck.predict(img, batch_size=1, verbose=1)
+                # i_bf = self.inception_bottleneck.predict(img, batch_size=1, verbose=1)
+                x = np.hstack([x_bf, i_bf])
+                tmp = self.logreg.predict_proba(x).reshape((-1,))
+                indices = np.argsort(tmp)
+                Value[i] = tmp[indices[-1]] / tmp[indices[-2]] 
+                X.append((tmp,indices[-3:]))
+
+        using_id = np.argsort(Value)[-1]
+
+        Probas = X[using_id][0][X[using_id][1]]
+        Breeds_ids = X[using_id][1]
+        Breeds_str = [dog_breeds[str(int(breed_id) - 1)] for breed_id in Breeds_ids]
+        return Breeds_str,Probas
 
 
 class CatBreedsModel(object):
     def __init__(self):
         super().__init__()
+        #shape 3,224,224
         self.pre_model = torch.nn.Sequential(*(list(timm.create_model('resnet50',
                 pretrained=True, num_classes=1000).children())[:-1]))
         self.log_reg = pickle.load(open("Models/Log_Reg_on_Resnet50_cats_features.sav", 'rb'))
 
-    def predict(self, img: torch.Tensor) -> Tuple[str, float]:
+    def predict(self, images:torch.Tensor) -> Tuple[str, float]:
+        X = []
+        Value = np.zeros(len(images))
         with torch.no_grad():
-            X = self.pre_model(img)
-        return cat_breeds[str(int(self.log_reg.predict(X))-1)], np.sort(self.log_reg.predict_proba(X)[0])[-1]
+            for i,img in enumerate(images):
+                tmp = self.log_reg.predict_proba(self.pre_model(img.unsqueeze(0))).reshape(-1)
+                indices = np.argsort(tmp)
+                Value[i] = tmp[indices[-1]] / tmp[indices[-2]] 
+                X.append((tmp,indices[-3:]))
+        
+        using_id = np.argsort(Value)[-1]
 
+        Probas = X[using_id][0][X[using_id][1]]
+        Breeds_ids = X[using_id][1]
+        print(Breeds_ids)
+        Breeds_str = [cat_breeds[str(int(breed_id))] for breed_id in Breeds_ids]
+        return Breeds_str,Probas
 
 class AnimalTypeModel(object):
     def __init__(self):
