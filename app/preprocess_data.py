@@ -4,9 +4,11 @@ import numpy as np
 import requests
 import torch
 from PIL import Image
-from keras.utils import image_utils
 from torchvision import transforms
-
+from typing import Union
+from typing import List
+from typing import AnyStr
+from typing import Union
 a = 0
 
 
@@ -16,20 +18,21 @@ def get_img_from_bytes(byte_array: bytes):
     return image
 
 
-def get_img_from_url(urls: Union[list[str],str]):
-    if type(urls) == list:
-        image_datas = [requests.get(url).content for url in urls]
+def get_img_from_url(urls: Union[List[AnyStr], AnyStr]):
+    if isinstance(urls, List):
+        print(1)
+        image_data_ = [requests.get(url).content for url in urls]
     else:
-        image_datas = [requests.get(urls).content]
-    return [get_img_from_bytes(image_data) for image_data in image_datas]
+        image_data_ = [requests.get(urls).content]
+    return [get_img_from_bytes(image_data) for image_data in image_data_]
 
 
-def get_img_from_path(pathes: Union[list[str],str]):
-    if type(pathes) == list:
-        images = [Image.open(path) for path in pathes]
+def get_img_from_path(paths: Union[List[AnyStr], AnyStr]):
+    if isinstance(paths, List):
+        images = [Image.open(path) for path in paths]
     else:
-        images = [Image.open(pathes)]
-    return [image.convert("RGB") for img in images]
+        images = [Image.open(paths)]
+    return [img.convert("RGB") for img in images]
 
 
 def process_image(images, shape: tuple, standardization=False) -> torch.Tensor:
@@ -49,7 +52,7 @@ def process_image(images, shape: tuple, standardization=False) -> torch.Tensor:
     )
     Ret = torch.empty(tuple([len(images)]+[3]+list(shape)))
     
-    for i,img in enumerate(images):
+    for i, img in enumerate(images):
         Ret[i] = transform(img)
         if standardization:
             Ret[i] = 2. * (Ret[i] - 0) - 1.

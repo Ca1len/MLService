@@ -1,13 +1,15 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
-
 import models
 import preprocess_data as prep
+from typing import Union
+from typing import List
+from typing import AnyStr
 
 
 class Image(BaseModel):
-    img_path: Union[list[AnyStr],AnuStr]
+    img_path: Union[List[AnyStr], AnyStr]
 
 
 device = "cpu"
@@ -40,19 +42,19 @@ async def pred_from_path(img: Image):
 @app.post("/predict/animal_type/from_url/")
 async def pred_type_from_url(img: Image):
     image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224))
-    a = animal_m.predict(img=image)
+    a = animal_m.predict(image)
     return {"class_name": a}
 
 
 @app.post("/predict/dog_breed/from_url/")
 async def pred_dog_from_url(img: Image):
     image = prep.process_image(prep.get_img_from_url(img.img_path), (299, 299), True)
-    b, prob = dog_breed.predict(img=image)
+    b, prob = dog_breed.predict(image)
     return {"breed": b, "probability": str(prob)}
 
 
 @app.post("/predict/cat_breed/from_url/")
-async def pred_dog_from_url(img: Image):
+async def pred_cat_from_url(img: Image):
     image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224))
-    b, prob = cat_breed.predict(img=image)
+    b, prob = cat_breed.predict(image)
     return {"breed": b, "probability": str(prob)}
