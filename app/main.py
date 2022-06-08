@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 import models
@@ -17,7 +17,6 @@ device = "cpu"
 animal_m = models.AnimalTypeModel()
 dog_breed = models.DogsBreedModel()
 cat_breed = models.CatBreedsModel()
-
 
 app = FastAPI()
 
@@ -41,20 +40,29 @@ async def pred_from_path(img: Image):
 
 @app.post("/predict/animal_type/from_url/")
 async def pred_type_from_url(img: Image):
-    image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224))
+    try:
+        image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224))
+    except:
+        raise HTTPException(status_code=400, detail="Wrong image type")
     a = animal_m.predict(image)
     return {"class_name": a}
 
 
 @app.post("/predict/dog_breed/from_url/")
 async def pred_dog_from_url(img: Image):
-    image = prep.process_image(prep.get_img_from_url(img.img_path), (299, 299), True)
+    try:
+        image = prep.process_image(prep.get_img_from_url(img.img_path), (299, 299), True)
+    except:
+        raise HTTPException(status_code=400, detail="Wrong image type")
     b, prob = dog_breed.predict(image)
     return {"breed": b, "probability": str(prob)}
 
 
 @app.post("/predict/cat_breed/from_url/")
 async def pred_cat_from_url(img: Image):
-    image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224))
+    try:
+        image = prep.process_image(prep.get_img_from_url(img.img_path), (224, 224))
+    except:
+        raise HTTPException(status_code=400, detail="Wrong image type")
     b, prob = cat_breed.predict(image)
     return {"breed": b, "probability": str(prob)}
